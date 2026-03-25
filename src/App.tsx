@@ -6,7 +6,9 @@ import { Footer } from './components/Footer';
 import { UploadModal } from './components/UploadModal';
 import { AuthModal } from './components/AuthModal';
 import { BlogPage } from './components/BlogPage';
+import { CommunityPage } from './components/CommunityPage';
 import { SearchFilter } from './components/SearchFilter';
+import { CommunityWriteModal } from './components/CommunityWriteModal';
 
 const MOCK_DATA = [
   { id: 1, name: '산양', scientificName: 'Naemorhedus caudatus', loc: '강원도 양구군', level: 'I', img: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=800' },
@@ -19,34 +21,74 @@ function App() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isWriteModalOpen, setIsWriteModalOpen] = useState(false);
   const [view, setView] = useState('home');
+  const [isCommunityWriteOpen, setIsCommunityWriteOpen] = useState(false);
 
   const filteredData = useMemo(() => 
     MOCK_DATA.filter(item => item.name.includes(searchTerm)), [searchTerm]
   );
 
-  const handleUploadClick = () => {
+  const handleDeleteAccount = () => {
+    if(confirm('정말로 탈퇴하시겠습니까?')) {
+      setIsLoggedIn(false);
+      setView('home');
+    }
+  };
+
+  const handleCommunityWrite = () => {
     if (!isLoggedIn) {
-      alert('기록을 시작하려면 로그인이 필요합니다.');
+      alert('커뮤니티에 글을 남기려면 로그인이 필요합니다.');
       setIsAuthOpen(true);
       return;
     }
-    setIsUploadOpen(true);
+    setIsCommunityWriteOpen(true);
   };
 
-  const handleDeleteAccount = () => {
-    const confirmText = prompt('계정을 삭제하려면 "삭제합니다"를 입력해주세요.');
-    if (confirmText === '삭제합니다') {
-      setIsLoggedIn(false);
-      setView('home');
-      alert('계정이 삭제되었습니다.');
-    } else if (confirmText !== null) {
-      alert('문구가 일치하지 않습니다.');
-    }
+  // 화면 렌더링 함수
+  const renderView = () => {
+    if (view === 'blog') return <BlogPage onDeleteAccount={handleDeleteAccount} />;
+    if (view === 'community') return <CommunityPage onWriteClick={handleCommunityWrite} />;
+    
+    return (
+      <main className="pt-24 pb-20 px-10 max-w-7xl mx-auto">
+        <section className="mb-16 mt-10 text-center lg:text-left">
+          <h1 className="text-6xl lg:text-7xl font-[900] tracking-tighter text-emerald-950 mb-6 leading-tight">
+            야생의 목격,<br/>보전의 기록.
+          </h1>
+          <div className="flex justify-center lg:justify-start gap-4">
+            <button 
+              onClick={() => isLoggedIn ? setIsUploadOpen(true) : setIsAuthOpen(true)}
+              className="bg-emerald-600 text-white px-10 py-5 rounded-2xl font-black text-lg hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-600/20"
+            >
+              지금 기록 시작하기
+            </button>
+            <button 
+              onClick={() => setView('community')}
+              className="bg-white text-emerald-900 border-2 border-emerald-100 px-10 py-5 rounded-2xl font-black text-lg hover:bg-emerald-50 transition-all"
+            >
+              커뮤니티 구경하기
+            </button>
+          </div>
+        </section>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          <div className="lg:col-span-8">
+            <h2 className="text-3xl font-black mb-8">최신 생태 발견</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {filteredData.map(obs => <ObservationCard key={obs.id} data={obs} />)}
+            </div>
+          </div>
+          <div className="lg:col-span-4 border-l border-gray-50 pl-12">
+            <Sidebar />
+          </div>
+        </div>
+      </main>
+    );
   };
 
   return (
-    <div className="min-h-screen bg-white font-sans text-emerald-950">
+    <div className="min-h-screen bg-white">
       <Navbar 
         isLoggedIn={isLoggedIn}
         onLoginClick={() => setIsAuthOpen(true)} 
@@ -58,48 +100,14 @@ function App() {
         setSearchTerm={setSearchTerm} 
       />
 
-      {view === 'home' ? (
-        <main className="pt-24 pb-20 px-10 max-w-7xl mx-auto">
-          <section className="mb-16 mt-10 text-center lg:text-left">
-            <h1 className="text-6xl lg:text-7xl font-[900] tracking-tighter text-emerald-950 mb-6 leading-tight">
-              야생의 목격,<br/>보전의 기록.
-            </h1>
-            <p className="text-emerald-700/60 font-bold mb-10 text-xl">당신의 관찰이 생태계를 지키는 위대한 데이터가 됩니다.</p>
-            <button 
-              onClick={handleUploadClick} 
-              className="bg-emerald-600 text-white px-10 py-5 rounded-2xl font-black text-lg hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-600/20 active:scale-95"
-            >
-              지금 기록 시작하기
-            </button>
-          </section>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            <div className="lg:col-span-8">
-              <div className="flex justify-between items-center mb-8">
-                <h2 className="text-3xl font-black">최신 생태 발견</h2>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {filteredData.map(obs => <ObservationCard key={obs.id} data={obs} />)}
-              </div>
-            </div>
-            <div className="lg:col-span-4">
-              <Sidebar />
-            </div>
-          </div>
-        </main>
-      ) : (
-        <BlogPage onDeleteAccount={handleDeleteAccount} />
-      )}
+      {renderView()}
 
       <Footer />
-      
       <UploadModal isOpen={isUploadOpen} onClose={() => setIsUploadOpen(false)} />
-      <AuthModal 
-        isOpen={isAuthOpen} 
-        onClose={() => setIsAuthOpen(false)} 
-        onLoginSuccess={() => setIsLoggedIn(true)} 
-      />
+      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} onLoginSuccess={() => setIsLoggedIn(true)} />
+      <CommunityWriteModal isOpen={isCommunityWriteOpen} onClose={() => setIsCommunityWriteOpen(false)} />
       <SearchFilter isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} />
+      <CommunityWriteModal isOpen={isWriteModalOpen} onClose={() => setIsWriteModalOpen(false)} />
     </div>
   );
 }
