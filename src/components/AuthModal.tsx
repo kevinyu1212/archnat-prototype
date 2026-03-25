@@ -1,25 +1,53 @@
-import React from 'react';
-import { X } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Mail, Lock, User, ArrowRight } from 'lucide-react';
 
-export const AuthModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+export const AuthModal = ({ isOpen, onClose, onLoginSuccess }: any) => {
+  const [mode, setMode] = useState<'login' | 'signup'>('login');
   if (!isOpen) return null;
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-      <div className="bg-white w-full max-w-md rounded-[40px] p-10 relative shadow-2xl animate-in fade-in zoom-in duration-300">
-        <button onClick={onClose} className="absolute top-6 right-6 p-2 hover:bg-gray-100 rounded-full transition-colors">
-          <X size={24} />
-        </button>
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-[900] text-emerald-950 mb-2">반가워요!</h2>
-          <p className="text-emerald-600 font-medium">아크넷과 함께 자연을 기록해보세요.</p>
-        </div>
-        <div className="space-y-4">
-          <input type="email" placeholder="이메일 주소" className="w-full px-6 py-4 rounded-2xl bg-emerald-50 border-none focus:ring-2 focus:ring-emerald-500 font-medium" />
-          <input type="password" placeholder="비밀번호" className="w-full px-6 py-4 rounded-2xl bg-emerald-50 border-none focus:ring-2 focus:ring-emerald-500 font-medium" />
-          <button className="w-full py-4 bg-[#1B4332] text-white rounded-2xl font-black text-lg shadow-lg hover:bg-emerald-800 transition-colors mt-4">로그인</button>
-        </div>
-        <div className="mt-8 text-center text-sm font-bold text-gray-400">
-          계정이 없으신가요? <span className="text-emerald-600 cursor-pointer">회원가입</span>
+    <div className="fixed inset-0 z-[200] flex justify-center items-center bg-emerald-950/60 backdrop-blur-md px-4">
+      <div className="w-full max-w-md bg-white rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+        <div className="p-8">
+          <div className="flex justify-between items-center mb-8">
+            <h3 className="text-2xl font-black text-emerald-950">
+              {mode === 'login' ? '다시 오셨군요!' : '탐험 시작하기'}
+            </h3>
+            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors"><X size={20}/></button>
+          </div>
+
+          <div className="space-y-4">
+            {mode === 'signup' && (
+              <div className="relative">
+                <User className="absolute left-4 top-3.5 text-emerald-300" size={18} />
+                <input type="text" placeholder="닉네임" className="w-full bg-gray-50 border-none rounded-2xl py-3.5 pl-12 pr-4 font-bold text-sm focus:ring-2 focus:ring-emerald-500 outline-none" />
+              </div>
+            )}
+            <div className="relative">
+              <Mail className="absolute left-4 top-3.5 text-emerald-300" size={18} />
+              <input type="email" placeholder="이메일 주소" className="w-full bg-gray-50 border-none rounded-2xl py-3.5 pl-12 pr-4 font-bold text-sm focus:ring-2 focus:ring-emerald-500 outline-none" />
+            </div>
+            <div className="relative">
+              <Lock className="absolute left-4 top-3.5 text-emerald-300" size={18} />
+              <input type="password" placeholder="비밀번호" className="w-full bg-gray-50 border-none rounded-2xl py-3.5 pl-12 pr-4 font-bold text-sm focus:ring-2 focus:ring-emerald-500 outline-none" />
+            </div>
+
+            <button 
+              onClick={() => { onLoginSuccess(); onClose(); }}
+              className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-black mt-4 shadow-lg shadow-emerald-600/20 hover:bg-emerald-700 transition-all flex items-center justify-center gap-2"
+            >
+              {mode === 'login' ? '로그인' : '계정 만들기'} <ArrowRight size={18} />
+            </button>
+          </div>
+
+          <div className="mt-8 text-center">
+            <button 
+              onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
+              className="text-sm font-bold text-emerald-600 hover:underline"
+            >
+              {mode === 'login' ? '아직 회원이 아니신가요? 가입하기' : '이미 계정이 있으신가요? 로그인'}
+            </button>
+          </div>
         </div>
       </div>
     </div>
