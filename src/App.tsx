@@ -4,6 +4,8 @@ import { AuthModal } from './components/AuthModal';
 import { ObservationCard } from './components/ObservationCard';
 import { Sidebar } from './components/Sidebar';
 import { SearchFilter } from './components/SearchFilter';
+import { Footer } from './components/Footer';
+import { UploadModal } from './components/UploadModal';
 import { Plus } from 'lucide-react';
 
 const MOCK_DATA = [
@@ -16,6 +18,7 @@ export default function App() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
 
   const filteredData = MOCK_DATA.filter(obs => 
     obs.name.includes(searchTerm) || obs.scientificName.toLowerCase().includes(searchTerm.toLowerCase())
@@ -39,7 +42,7 @@ export default function App() {
             야생의 목격,<br/>보전의 기록.
           </h1>
           <p className="text-emerald-700/60 font-bold mb-10 text-xl">당신의 관찰이 생태계를 지키는 위대한 데이터가 됩니다.</p>
-          <button className="bg-emerald-600 text-white px-10 py-5 rounded-2xl font-black text-lg hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-600/20 active:scale-95">
+          <button onClick={() => setIsUploadOpen(true)} className="bg-emerald-600 text-white px-10 py-5 rounded-2xl font-black text-lg hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-600/20 active:scale-95">
             지금 기록 시작하기
           </button>
         </section>
@@ -62,6 +65,8 @@ export default function App() {
           </div>
         </div>
       </main>
+      <Footer />
+      <UploadModal isOpen={isUploadOpen} onClose={() => setIsUploadOpen(false)} />
 
       
     </div>
